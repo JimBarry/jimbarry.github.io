@@ -33,8 +33,9 @@
         "esri/renderers/visualVariables/RotationVariable",
         "esri/widgets/CoordinateConversion",        
         "esri/widgets/BasemapToggle",
-        "esri/widgets/Measurement"
-      ], function(Map, Graphic, MapView, FeatureLayer, GraphicsLayer, Point, PictureMarkerSymbol, TextSymbol, UniqueValueRenderer, RotationVariable, CoordinateConversion, BasemapToggle, Measurement) {
+        "esri/widgets/Measurement",
+        "esri/widgets/Editor"
+      ], function(Map, Graphic, MapView, FeatureLayer, GraphicsLayer, Point, PictureMarkerSymbol, TextSymbol, UniqueValueRenderer, RotationVariable, CoordinateConversion, BasemapToggle, Measurement, Editor) {
       
 /// GLOBALS
 
@@ -150,8 +151,32 @@
 
 /// LAYERS
 
+        var template = {
+          title: 'Aircraft',
+          content: [
+            {
+              type: "fields",
+              fieldInfos: [
+                {fieldName: "Aircraft_Type",      label: "Aircraft Type"},
+                {fieldName: "Manufacturer",       label: "Manufacturer"},
+                {fieldName: "Model",              label: "Model"},
+                {fieldName: "Wingspan",           label: "Wingspan (ft)"},
+                {fieldName: "Length",             label: "Length (ft)"},
+                {fieldName: "Gross_Weight",       label: "Gross Weight"},
+                {fieldName: "Registration Number",label: "Registration Number"},
+                {fieldName: "Carrier",            label: "Carrier"},
+                {fieldName: "Date In",            label: "Date In"},
+                {fieldName: "Date Out",           label: "Date Out"},
+                {fieldName: "Rotation",           label: "Rotation"},
+                {fieldName: "AircraftType",       label: "Aircraft Type"}
+              ]
+            }
+          ]
+        } // end template
+
         var flAircraft = new FeatureLayer({
-          url: "https://services.arcgis.com/6I1ysurtNWNxkuwd/arcgis/rest/services/Aircraft_Storage/FeatureServer"
+          url: "https://services.arcgis.com/6I1ysurtNWNxkuwd/arcgis/rest/services/Aircraft_Storage/FeatureServer",
+          popupTemplate: template
         });
         map.add(flAircraft);
 
@@ -159,6 +184,7 @@
         map.add(glyrMapLabels);
 
 /// WIDGETS
+
         var toggleWidget = new BasemapToggle({
           view: mapView,
           nextBasemap: "gray"
@@ -166,14 +192,14 @@
         var coordWidget = new CoordinateConversion({
           view: mapView
         });
-        var measureWidget = new Measurement({
-          view: mapView,
-          activeTool: "distance",
-          linearUnit: "us-feet"
-        });
+        //var measureWidget = new Measurement({
+        //  view: mapView,
+        //  activeTool: "distance",
+        //  linearUnit: "us-feet"
+        //});
         mapView.ui.add(toggleWidget, "top-right");
         mapView.ui.add(coordWidget, "bottom-left");
-        mapView.ui.add(measureWidget, "bottom-right");
+        //mapView.ui.add(measureWidget, "bottom-right");
         
 /// EVENTS
 
