@@ -100,49 +100,22 @@
           var uvr = new UniqueValueRenderer({
             field: 'Model',
             visualVariables: rv,
-            uniqueValueInfos: [{
-              value: '777 300',
-              symbol: makeAircraftSymbol('777 300')
-            }, {
-              value: '747 400',
-              symbol: makeAircraftSymbol('747 400')
-            }, {
-              value: '767 300',
-              symbol: makeAircraftSymbol('767 300')
-            }, {
-              value: 'KC-135',
-              symbol: makeAircraftSymbol('KC-135')
-            }, {
-              value: '737 800',
-              symbol: makeAircraftSymbol('737 800')
-            }, {
-              value: '737 400',
-              symbol: makeAircraftSymbol('737 400')
-            }, {
-              value: 'CRJ 700',
-              symbol: makeAircraftSymbol('CRJ 700')
-            }, {
-              value: 'CRJ 200',
-              symbol: makeAircraftSymbol('CRJ 200')
-            }, {
-              value: 'Dash 8 300',
-              symbol: makeAircraftSymbol('Dash 8 300')
-            }, {
-              value: 'MD 11',
-              symbol: makeAircraftSymbol('MD 11')
-            }, {
-              value: 'MD 90',
-              symbol: makeAircraftSymbol('MD 90')
-            }, {
-              value: '320',
-              symbol: makeAircraftSymbol('320')
-            }, {
-              value: '321',
-              symbol: makeAircraftSymbol('321')
-            }, {
-              value: '300 B',
-              symbol: makeAircraftSymbol('300 B')
-            }]
+            uniqueValueInfos: [
+              {value: '777 300',   symbol: makeAircraftSymbol('777 300')}, 
+              {value: '747 400',   symbol: makeAircraftSymbol('747 400')}, 
+              {value: '767 300',   symbol: makeAircraftSymbol('767 300')}, 
+              {value: 'KC-135',    symbol: makeAircraftSymbol('KC-135')}, 
+              {value: '737 800',   symbol: makeAircraftSymbol('737 800')}, 
+              {value: '737 400',   symbol: makeAircraftSymbol('737 400')}, 
+              {value: 'CRJ 700',   symbol: makeAircraftSymbol('CRJ 700')}, 
+              {value: 'CRJ 200',   symbol: makeAircraftSymbol('CRJ 200')}, 
+              {value: 'Dash 8 300',symbol: makeAircraftSymbol('Dash 8 300')}, 
+              {value: 'MD 11',     symbol: makeAircraftSymbol('MD 11')}, 
+              {value: 'MD 90',     symbol: makeAircraftSymbol('MD 90')}, 
+              {value: '320',       symbol: makeAircraftSymbol('320')}, 
+              {value: '321',       symbol: makeAircraftSymbol('321')}, 
+              {value: '300 B',     symbol: makeAircraftSymbol('300 B')}
+            ]
           });
 
           flAircraft.renderer = uvr;
