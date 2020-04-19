@@ -39,11 +39,23 @@
       
 /// GLOBALS
 
+        // each map scale zoom level has a different size for the 
+        // aircraft marker symbols to preserve their real world size.
         var scaleSizes = new Array(25);
         scaleSizes[16] = "40px";
         scaleSizes[17] = "80px";
         scaleSizes[18] = "160px";
 
+        // add, remove, modify aircraft "Models" here
+        var arrayModels = [
+                           '300 B', '320', '321', 
+                           '737 400', '737 800', '747 400', '767 300', '777 300',
+                           'CRJ 200', 'CRJ 700',
+                           'Dash 8 300',
+                           'KC-135',
+                           'MD 11', 'MD 90'
+                           ];
+                           
 /// MAP AND VIEW
 
         var map = new Map({
@@ -79,8 +91,10 @@
 
         function renderAircraft() {
 
+          // the size of the aircraft marker symbols will vary by map scale zoom level
           var mrk_size = scaleSizes[mapView.zoom];
 
+          // given an aircraft model, make a picture marker symbol for it from PNG images
           function makeAircraftSymbol(aircraftType) {
             var pms = new PictureMarkerSymbol({
               url: 'images/' + aircraftType + '.png',
@@ -88,6 +102,14 @@
               height: mrk_size
             });
             return pms;
+          }
+
+          // make array of unique value infos
+          var uvi = [];
+          for (i=0; i<arrayModels.length ;i++) {
+            var str = arrayModels[i]
+            var eachUvi = {value: str, symbol: makeAircraftSymbol(str)};
+            uvi.push(eachUvi);
           }
 
           // rotate aircraft markers using field value
@@ -100,22 +122,7 @@
           var uvr = new UniqueValueRenderer({
             field: 'Model',
             visualVariables: rv,
-            uniqueValueInfos: [
-              {value: '777 300',   symbol: makeAircraftSymbol('777 300')}, 
-              {value: '747 400',   symbol: makeAircraftSymbol('747 400')}, 
-              {value: '767 300',   symbol: makeAircraftSymbol('767 300')}, 
-              {value: 'KC-135',    symbol: makeAircraftSymbol('KC-135')}, 
-              {value: '737 800',   symbol: makeAircraftSymbol('737 800')}, 
-              {value: '737 400',   symbol: makeAircraftSymbol('737 400')}, 
-              {value: 'CRJ 700',   symbol: makeAircraftSymbol('CRJ 700')}, 
-              {value: 'CRJ 200',   symbol: makeAircraftSymbol('CRJ 200')}, 
-              {value: 'Dash 8 300',symbol: makeAircraftSymbol('Dash 8 300')}, 
-              {value: 'MD 11',     symbol: makeAircraftSymbol('MD 11')}, 
-              {value: 'MD 90',     symbol: makeAircraftSymbol('MD 90')}, 
-              {value: '320',       symbol: makeAircraftSymbol('320')}, 
-              {value: '321',       symbol: makeAircraftSymbol('321')}, 
-              {value: '300 B',     symbol: makeAircraftSymbol('300 B')}
-            ]
+            uniqueValueInfos: uvi
           });
 
           flAircraft.renderer = uvr;
@@ -192,3 +199,7 @@
     <div id="viewDiv"></div>
   </body>
 </html>
+
+<!--
+/users/jimba/library/Application Support/Microsoft/Teams/Backgrounds/Uploads
+  -->
