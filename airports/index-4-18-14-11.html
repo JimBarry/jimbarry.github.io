@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no" />
+    <title>Airplane Storage v1</title>
+
+    <link rel="stylesheet" href="https://js.arcgis.com/4.15/esri/themes/light/main.css" />
+    <script src="https://js.arcgis.com/4.15/"></script>
+
+    <style>
+      html,
+      body,
+      #viewDiv {
+        padding: 0;
+        margin: 0;
+        height: 100%;
+        width: 100%;
+      }
+    </style>
+
+    <script>
+      require([
+        "esri/Map",
+        "esri/Graphic",
+        "esri/views/MapView",
+        "esri/layers/FeatureLayer",
+        "esri/layers/GraphicsLayer",
+        "esri/geometry/Point",
+        "esri/symbols/PictureMarkerSymbol",
+        "esri/symbols/TextSymbol",
+        "esri/renderers/UniqueValueRenderer",
+        "esri/widgets/CoordinateConversion",        
+        "esri/widgets/BasemapToggle",
+        "esri/widgets/Measurement"
+      ], function(Map, Graphic, MapView, FeatureLayer, GraphicsLayer, Point, PictureMarkerSymbol, TextSymbol, UniqueValueRenderer, CoordinateConversion, BasemapToggle, Measurement) {
+      
+        var mrk_size = "160px";
+        var zoom_lvl = 18;
+
+        //
+        var map = new Map({
+          basemap: "hybrid"
+        });
+
+        // 
+        var mapView = new MapView({
+          container: "viewDiv",
+          map: map,
+          zoom: zoom_lvl,
+          center: [-112.011, 33.433],
+          navigation: {mouseWheelZoomEnabled: false}, 
+          constraints: {maxZoom: 18, minZoom: 16}
+        });
+
+
+
+
+        // aircraft outlines, actual size - TESTING ONLY
+        //var flAircraftMasks = new FeatureLayer({
+        //  url: "https://services.arcgis.com/6I1ysurtNWNxkuwd/arcgis/rest/services/Aircraft_Masks/FeatureServer"
+        //})
+        //map.add(flAircraftMasks);
+
+        function drawZoomLevelLabel(){
+
+          glyrMapLabels.removeAll();
+          var tsym = new TextSymbol({
+            text: zoom_lvl.toString(), 
+            color: 'red', 
+            font: {size: 16, weight: 'bold'},
+            haloColor: 'white',
+            haloSize: '2px'
+          });
+          var pt = mapView.toMap(new Point({x: 30, y: 110}));
+          var gr = new Graphic({geometry: pt, symbol: tsym});
+          glyrMapLabels.add(gr);
+
+        }
+
+
+
+        function makeAircraftSymbol(aircraftType) {
+
+          var pms = new PictureMarkerSymbol({
+            url: 'images/plane' + aircraftType + '.png',
+            width: mrk_size,
+            height: mrk_size
+          })
+          return pms;
+        }
+
+        // renderer for aircraft layer
+        var uvr = new UniqueValueRenderer({
+          field: 'AircraftType',
+          uniqueValueInfos: [{
+            value: '1',
+            symbol: makeAircraftSymbol('1')
+          }, {
+            value: '2',
+            symbol: makeAircraftSymbol('2')
+          }, {
+            value: '3',
+            symbol: makeAircraftSymbol('3')
+          }]
+        });
+
+/// LAYERS
+        var flAircraft = new FeatureLayer({
+          url: "https://services.arcgis.com/6I1ysurtNWNxkuwd/arcgis/rest/services/Aircraft_Storage/FeatureServer",
+          renderer: uvr
+        });
+        map.add(flAircraft);
+
+        var glyrMapLabels = new GraphicsLayer();
+        map.add(glyrMapLabels);
+
+/// WIDGETS
+        var toggleWidget = new BasemapToggle({
+          view: mapView,
+          nextBasemap: "gray"
+        });
+        var coordWidget = new CoordinateConversion({
+          view: mapView
+        });
+        var measureWidget = new Measurement({
+          view: mapView,
+          activeTool: "distance",
+          linearUnit: "us-feet"
+        });
+        mapView.ui.add(toggleWidget, "top-right");
+        mapView.ui.add(coordWidget, "bottom-left");
+        mapView.ui.add(measureWidget, "bottom-right");
+        
+
+        mapView.when(function() {
+          drawZoomLevelLabel();
+        });
+
+      }); // END OF REQUIRE
+    </script>
+  </head>
+
+  <body>
+    <div id="viewDiv"></div>
+  </body>
+</html>
+
+<!--
+/users/jimba/library/Application Support/Microsoft/Teams/Backgrounds/Uploads
+  -->
