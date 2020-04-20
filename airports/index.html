@@ -1,205 +1,471 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no" />
-    <title>Airplane Storage v1</title>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+  <meta name="description" content="ArcGIS JS v4, Calcite Maps and Bootstrap Example">
+ 
+  <title>ArcGIS JS v4, Calcite Maps and Bootstrap Example</title>
 
-    <link rel="stylesheet" href="https://js.arcgis.com/4.15/esri/themes/light/main.css" />
-    <script src="https://js.arcgis.com/4.15/"></script>
+  <!-- Calcite Maps Bootstrap -->
+  <link rel="stylesheet" href="https://esri.github.io/calcite-maps/dist/css/calcite-maps-bootstrap.min-v0.10.css">
+  
+  <!-- Calcite Maps -->
+  <link rel="stylesheet" href="https://esri.github.io/calcite-maps/dist/css/calcite-maps-arcgis-4.x.min-v0.10.css">
 
-    <style>
-      html,
-      body,
-      #viewDiv {
-        padding: 0;
-        margin: 0;
-        height: 100%;
+  <!-- ArcGIS JS 4 -->
+  <link rel="stylesheet" href="https://js.arcgis.com/4.15/esri/css/main.css">
+
+  <style>
+    html,
+    body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      width: 100%;
+    }
+  </style>
+
+</head>
+
+<body class="calcite-maps calcite-nav-top">
+  <!-- Navbar -->
+
+  <nav class="navbar calcite-navbar navbar-fixed-top calcite-text-light calcite-bg-dark">
+    <!-- Menu -->
+    <div class="dropdown calcite-dropdown calcite-text-dark calcite-bg-light" role="presentation">
+      <a class="dropdown-toggle" role="menubutton" aria-haspopup="true" aria-expanded="false" tabindex="0">
+        <div class="calcite-dropdown-toggle">
+          <span class="sr-only">Toggle dropdown menu</span>
+          <span></span>
+          <span></span>
+          <span></span>
+          <span></span>
+        </div>
+      </a>
+      <ul class="dropdown-menu" role="menu">
+        <li><a role="menuitem" tabindex="0" data-target="#panelInfo" aria-haspopup="true"><span class="glyphicon glyphicon-info-sign"></span> About</a></li>
+        <li><a role="menuitem" tabindex="0" href="#" data-target="#panelLegend" aria-haspopup="true"><span class="glyphicon glyphicon-list-alt"></span> Legend</a></li>
+        <li><a role="menuitem" tabindex="0" href="#" id="calciteToggleNavbar" aria-haspopup="true"><span class="glyphicon glyphicon-fullscreen"></span> Full Map</a></li>
+      </ul>
+    </div>
+    <!-- Title -->
+    <div class="calcite-title calcite-overflow-hidden">
+      <span class="calcite-title-main">Calcite Maps</span>
+      <span class="calcite-title-divider hidden-xs"></span>
+      <span class="calcite-title-sub hidden-xs">A Bootstrap theme for building modern map apps</span>
+    </div>
+    <!-- Nav -->
+    <ul class="nav navbar-nav calcite-nav">
+      <li>
+        <div class="calcite-navbar-search calcite-search-expander">
+          <div id="searchWidgetDiv"></div>
+        </div>
+      </li>
+    </ul>
+  </nav>
+
+  <!--/.calcite-navbar -->
+
+  <!-- Map  -->
+
+  <div class="calcite-map calcite-map-absolute">
+    <div id="mapViewDiv"></div>
+  </div>
+
+  <!-- /.calcite-map -->
+
+  <!-- Panels -->
+
+  <div class="calcite-panels calcite-panels-right calcite-text-light calcite-bg-dark panel-group">
+
+    <!-- Panel - Basemaps -->
+
+    <div id="panelInfo" class="panel collapse in">
+      <div id="headingInfo" class="panel-heading" role="tab">
+        <div class="panel-title">
+          <a class="panel-toggle" role="button" data-toggle="collapse" href="#collapseInfo"  aria-expanded="true" aria-controls="collapseInfo"><span class="glyphicon glyphicon-info-sign" aria-hidden="true"></span><span class="panel-label">About</span></a> 
+          <a class="panel-close" role="button" data-toggle="collapse" tabindex="0" href="#panelInfo"><span class="esri-icon esri-icon-close" aria-hidden="true"></span></a>  
+        </div>
+      </div>
+      <div id="collapseInfo" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="headingInfo">
+        <div class="panel-body">
+          <p>This is my map app!</p>
+        </div>
+     </div>
+    </div>
+
+    <!-- Panel - Legend -->
+
+    <div id="panelLegend" class="panel collapse">
+      <div id="headingLegend" class="panel-heading" role="tab">
+        <div class="panel-title">
+          <a class="panel-toggle" role="button" data-toggle="collapse" href="#collapseLegend" aria-expanded="false" aria-controls="collapseLegend"><span class="glyphicon glyphicon-list-alt" aria-hidden="true"></span><span class="panel-label">Legend</span></a> 
+          <a class="panel-close" role="button" data-toggle="collapse" tabindex="0" href="#panelLegend"><span class="esri-icon esri-icon-close" aria-hidden="true"></span></a> 
+        </div>
+      </div>
+      <div id="collapseLegend" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingLegend">
+        <div class="panel-body">            
+          <div id="legendDiv"></div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- /.calcite-panels -->
+
+  <div id="editorDiv"></div>
+  <div id="infoDiv">
+      <b>Plane Selected:</b>
+      <div id="selectedDiv">No Selection</div>
+      <div id="sliderDiv"></div>
+      <button id="clearBtn">Clear</button>
+  </div>
+  <div id="inputDiv">
+      <label for="layerInput">Please input a URL to a Feature Layer</label>
+      <!-- <input type="text" id="layerInput" name="layerInput"
+          value="https://services.arcgis.com/6I1ysurtNWNxkuwd/arcgis/rest/services/Planes/FeatureServer/0"> -->
+      <input type="text" id="layerInput" name="layerInput"
+          value="https://services.arcgis.com/6I1ysurtNWNxkuwd/ArcGIS/rest/services/Aircraft_Storage/FeatureServer/0"><br><br>
+      <button id="getLayerBtn">Submit</button>
+  </div>
+
+  <script type="text/javascript">
+    var dojoConfig = {
+      packages: [{
+        name: "bootstrap",
+        location: "https://esri.github.io/calcite-maps/dist/vendor/dojo-bootstrap"
+      },
+      {
+        name: "calcite-maps",
+        location: "https://esri.github.io/calcite-maps/dist/js/dojo"
+      }]
+    };
+  </script>
+
+  <!-- ArcGIS JS 4 -->
+  <script src="https://js.arcgis.com/4.15/"></script>
+
+  <style>
+    .esri-editor .esri-item-list__scroller {
+        max-height: 350px;
+    }
+
+    #infoDiv {
+        background-color: #F5F5F5;
+        padding: 10px;
+        width: 320px;
+        margin: 5px;
+        position: absolute;
+        bottom: 15px;
+        right: 10px;
+        font-size: 14px;
+        display: block;
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+    }
+
+    #inputDiv {
+        background-color: #F5F5F5;
+        padding: 10px;
+        width: 320px;
+        margin: 5px;
+        position: absolute;
+        bottom: 15px;
+        right: 400px;
+        font-size: 14px;
+        display: block;
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+    }
+
+    #sliderDiv {
         width: 100%;
-      }
-    </style>
+        height: 60px;
+        z-index: 5;
+    }
+</style>
 
-    <script>
-      require([
-        "esri/Map",
-        "esri/Graphic",
-        "esri/views/MapView",
-        "esri/layers/FeatureLayer",
-        "esri/layers/GraphicsLayer",
-        "esri/geometry/Point",
-        "esri/symbols/PictureMarkerSymbol",
-        "esri/symbols/TextSymbol",
-        "esri/renderers/UniqueValueRenderer",
-        "esri/renderers/visualVariables/RotationVariable",
-        "esri/widgets/CoordinateConversion",        
-        "esri/widgets/BasemapToggle",
-        "esri/widgets/Measurement",
-        "esri/widgets/Editor"
-      ], function(Map, Graphic, MapView, FeatureLayer, GraphicsLayer, Point, PictureMarkerSymbol, TextSymbol, UniqueValueRenderer, RotationVariable, CoordinateConversion, BasemapToggle, Measurement, Editor) {
-      
-/// GLOBALS
+  <script>
+    
+    require([
+      // ArcGIS
+      "esri/Map", 
+      "esri/views/MapView",
 
-        // each map scale zoom level has a different size for the 
-        // aircraft marker symbols to preserve their real world size.
-        var scaleSizes = new Array(25);
-        scaleSizes[16] = "40px";
-        scaleSizes[17] = "80px";
-        scaleSizes[18] = "160px";
+      // Widgets
+      "esri/widgets/Editor", 
+      "esri/widgets/Slider", 
+      "esri/widgets/Home",
+      "esri/widgets/Zoom",
+      "esri/widgets/Compass",
+      "esri/widgets/Search",
+      "esri/widgets/Legend",
+      "esri/widgets/BasemapToggle",
+      "esri/widgets/ScaleBar",
+      "esri/widgets/Attribution",
 
-        // add, remove, modify aircraft "Models" here
-        var arrayModels = [
-                           '300 B', '320', '321', 
-                           '737 400', '737 800', '747 400', '767 300', '777 300',
-                           'CRJ 200', 'CRJ 700',
-                           'Dash 8 300',
-                           'KC-135',
-                           'MD 11', 'MD 90'
-                           ];
-                           
-/// MAP AND VIEW
+      "esri/layers/FeatureLayer", 
+      "esri/renderers/UniqueValueRenderer",
+      "esri/renderers/visualVariables/RotationVariable", 
+      "esri/symbols/PictureMarkerSymbol",
 
-        var map = new Map({
+      // Bootstrap
+      "bootstrap/Collapse",
+      "bootstrap/Dropdown",
+
+      // Calcite Maps
+      "calcite-maps/calcitemaps-v0.10",
+      // Calcite Maps ArcGIS Support
+      "calcite-maps/calcitemaps-arcgis-support-v0.10",
+
+      "dojo/domReady!"
+    ], function(Map, MapView, Editor, Slider, Home, Zoom, Compass, Search, Legend, BasemapToggle, ScaleBar, Attribution, FeatureLayer, UniqueValueRenderer, RotationVariable, PictureMarkerSymbol, Collapse, Dropdown, CalciteMaps, CalciteMapArcGISSupport) {
+
+      /******************************************************************
+       *
+       * Create the map, view and widgets
+       * 
+       ******************************************************************/
+
+      var value, planeLayer, planeGraphic, highlightSelect, planeLayerView;
+
+      var scaleSizes = new Array(25);
+      scaleSizes[16] = "40px";
+      scaleSizes[17] = "80px";
+      scaleSizes[18] = "160px";
+
+      // add, remove, modify aircraft "Models" here; put them in any order
+      var arrayModels = [
+        '300 B', '320', '321',               // Airbus
+        '737 400', '737 800', '747 400',     // Boeing
+        '767 300', '777 300', 'KC-135',      // Boeing
+        'CRJ 200', 'CRJ 700', 'Dash 8 300',  // Bombardier
+        'MD 11', 'MD 90'                     // McDonnell Douglas
+      ];
+
+      var map = new Map({
           basemap: "hybrid"
-        });
+      });
+      
+      // View
+      var mapView = new MapView({
+        container: "mapViewDiv",
+        map: map,
+        padding: {
+          top: 50,
+          bottom: 0
+        },
+        ui: {components: []},
+        zoom: 18,
+        center: [-112.009, 33.433],
+        navigation: {mouseWheelZoomEnabled: false}, 
+        constraints: { maxZoom: 18, minZoom: 16 }
+      });
 
-        var mapView = new MapView({
-          container: "viewDiv",
-          map: map,
-          zoom: 18,
-          center: [-112.009, 33.433],
-          navigation: {mouseWheelZoomEnabled: false}, 
-          constraints: {maxZoom: 18, minZoom: 16}
-        });
+      // Popup and panel sync
+      mapView.when(function(){
+        CalciteMapArcGISSupport.setPopupPanelSync(mapView);
+      });
 
-/// FUNCTIONS
+      // Search - add to navbar
+      var searchWidget = new Search({
+        container: "searchWidgetDiv",
+        view: mapView
+      });
+      CalciteMapArcGISSupport.setSearchExpandEvents(searchWidget);
 
-        function drawZoomLevelLabel(){
+      // Map widgets
+      var home = new Home({
+        view: mapView
+      });
+      mapView.ui.add(home, "top-left");
 
-          glyrMapLabels.removeAll();
-          var tsym = new TextSymbol({
-            text: mapView.zoom.toFixed().toString(), 
-            color: 'red', 
-            font: {size: 16, weight: 'bold'},
-            haloColor: 'white',
-            haloSize: '2px'
-          });
-          var pt = mapView.toMap(new Point({x: 30, y: 110}));
-          var gr = new Graphic({geometry: pt, symbol: tsym});
-          glyrMapLabels.add(gr);
+      var zoom = new Zoom({
+        view: mapView
+      });
+      mapView.ui.add(zoom, "top-left");
 
-        }
+      var compass = new Compass({
+        view: mapView
+      });
+      mapView.ui.add(compass, "top-left");
+      
+      var basemapToggle = new BasemapToggle({
+        view: mapView,
+        secondBasemap: "satellite"
+      });
+      mapView.ui.add(basemapToggle, "bottom-right");          
+      
+      var scaleBar = new ScaleBar({
+        view: mapView
+      });
+      mapView.ui.add(scaleBar, "bottom-left");
 
-        function renderAircraft() {
+      var attribution = new Attribution({
+        view: mapView
+      });
+      mapView.ui.add(attribution, "manual");
 
-          // the size of the aircraft marker symbols will vary by map scale zoom level
-          var mrk_size = scaleSizes[mapView.zoom];
+      // Panel widgets - add legend
+      var legendWidget = new Legend({
+        container: "legendDiv",
+        view: mapView
+      });
 
-          // given an aircraft model, make a picture marker symbol for it from PNG images
-          function makeAircraftSymbol(aircraftType) {
-            var pms = new PictureMarkerSymbol({
-              url: 'images/' + aircraftType + '.png',
-              width: mrk_size,
-              height: mrk_size
-            });
-            return pms;
-          }
 
-          // make array of unique value infos
-          var uvi = [];
-          for (i=0; i<arrayModels.length ;i++) {
-            var str = arrayModels[i]
-            var eachUvi = {value: str, symbol: makeAircraftSymbol(str)};
-            uvi.push(eachUvi);
-          }
+      mapView.watch('zoom', function (evt) {
+          console.log(evt)
+          renderAircraft();
+      })
 
-          // rotate aircraft markers using field value
-          var rv = new RotationVariable({
-            field: 'Rotation',
-            rotationType: 'geographic'
-          })
+      var rotateSlider = new Slider({
+          container: "sliderDiv",
+          min: 0,
+          max: 180,
+          steps: 1,
+          visibleElements: {
+              labels: true,
+              rangeLabels: true
+          },
+          values: [0]
+      });
 
-          // renderer for aircraft layer
-          var uvr = new UniqueValueRenderer({
-            field: 'Model',
-            visualVariables: rv,
-            uniqueValueInfos: uvi
-          });
-
-          flAircraft.renderer = uvr;
-
-        } // end of function: renderAircraft()
-
-/// LAYERS
-
-        var template = {
+      var template = {
           title: 'Aircraft',
           content: [
-            {
-              type: "fields",
-              fieldInfos: [
-                {fieldName: "Aircraft_Type",      label: "Aircraft Type"},
-                {fieldName: "Manufacturer",       label: "Manufacturer"},
-                {fieldName: "Model",              label: "Model"},
-                {fieldName: "Wingspan",           label: "Wingspan (ft)"},
-                {fieldName: "Length",             label: "Length (ft)"},
-                {fieldName: "Gross_Weight",       label: "Gross Weight"},
-                {fieldName: "Carrier",            label: "Carrier"},
-                {fieldName: "Date In",            label: "Date In"},
-                {fieldName: "Date Out",           label: "Date Out"},
-                {fieldName: "Rotation",           label: "Rotation"}
-              ]
-            }
+              {
+                  type: "fields",
+                  fieldInfos: [
+                      { fieldName: "Aircraft_Type", label: "Aircraft Type" },
+                      { fieldName: "Manufacturer", label: "Manufacturer" },
+                      { fieldName: "Model", label: "Model" },
+                      { fieldName: "Wingspan", label: "Wingspan (ft)" },
+                      { fieldName: "Length", label: "Length (ft)" },
+                      { fieldName: "Gross_Weight", label: "Gross Weight" },
+                      { fieldName: "Carrier", label: "Carrier" },
+                      { fieldName: "Date In", label: "Date In" },
+                      { fieldName: "Date Out", label: "Date Out" },
+                      { fieldName: "Rotation", label: "Rotation" }
+                  ]
+              }
           ]
-        } // end template
+      }
 
-        var flAircraft = new FeatureLayer({
-          url: "https://services.arcgis.com/6I1ysurtNWNxkuwd/arcgis/rest/services/Aircraft_Storage/FeatureServer",
-          popupTemplate: template
-        });
-        map.add(flAircraft);
+      rotateSlider.on(["thumb-drag"], function (event) {
+          console.log(planeGraphic);
+          planeGraphic.attributes.Rotation = event.value;
+          var edits = { updateFeatures: [planeGraphic] }
+          planeLayer.applyEdits(edits);
+      })
 
-        var glyrMapLabels = new GraphicsLayer();
-        map.add(glyrMapLabels);
 
-/// WIDGETS
+      document.getElementById("clearBtn").onclick = function () {
+          if (highlightSelect) {
+              highlightSelect.remove();
+          }
+          planeGraphic = null;
+          rotateSlider.values = [0];
+          document.getElementById("selectedDiv").innerText = "No Selection";
+      }
 
-        var toggleWidget = new BasemapToggle({
-          view: mapView,
-          nextBasemap: "gray"
-        });
-        var coordWidget = new CoordinateConversion({
-          view: mapView
-        });
-        //var measureWidget = new Measurement({
-        //  view: mapView,
-        //  activeTool: "distance",
-        //  linearUnit: "us-feet"
-        //});
-        mapView.ui.add(toggleWidget, "top-right");
-        mapView.ui.add(coordWidget, "bottom-left");
-        //mapView.ui.add(measureWidget, "bottom-right");
-        
-/// EVENTS
+      document.getElementById("getLayerBtn").onclick = function () {
 
-        mapView.when(function() {
-          drawZoomLevelLabel();
-          renderAircraft();
-        });
+          
+          var url = document.getElementById("layerInput").value;
+          planeLayer = new FeatureLayer({
+              url: url,
+              popupTemplate: template,
+              outFields: ["*"]
+          });
+          map.add(planeLayer);
+          planeLayer.when(function () {
+              renderAircraft();
+              return planeLayer.queryExtent()
+          }).then(function (response) {
+              //mapView.goTo(response.extent);
 
-        mapView.watch('zoom', function(){
-          drawZoomLevelLabel();
-          renderAircraft();
+              let editor = new Editor({
+                  view: mapView
+              });
+              // Add widget to top-right of the view
+              mapView.ui.add(editor, "top-right");
+
+              /* editor.watch("activeWorkflow", function (evt) {
+                  if(evt){
+                      evt.data.viewModel.sketchViewModel.pointSymbol = symbol;
+                  console.log(evt.data.viewModel.sketchViewModel.pointSymbol);
+                  }
+              }) */
+
+              mapView.whenLayerView(planeLayer).then(function (layerView) {
+                  planeLayerView = layerView;
+                  console.log(layerView);
+              });
+          });
+      }
+
+      mapView.when(function () {
+          mapView.on("click", function (event) {
+              mapView.hitTest(event).then(function (response) {
+                  if (highlightSelect) {
+                      highlightSelect.remove();
+                  }
+                  console.log(response.results[0].graphic)
+                  document.getElementById("selectedDiv").innerText = response.results[0].graphic.attributes.Manufacturer + " " + response.results[0].graphic.attributes.Model;
+                  rotateSlider.values = [response.results[0].graphic.attributes.Rotation];
+                  planeGraphic = response.results[0].graphic;
+                  value = response.results[0].graphic.attributes.rotate;
+                  console.log(response.results[0]);
+                  console.log(planeLayerView)
+                  highlightSelect = planeLayerView.highlight(response.results[0].graphic);
+              })
+          })
+      })
+
+      function renderAircraft() {
+
+        // the size of the aircraft marker symbols will vary by map scale zoom level
+        var mrk_size = scaleSizes[mapView.zoom];
+
+        // given an aircraft model, make a picture marker symbol from PNG images
+        function makeAircraftSymbol(aircraftType) {
+          var pms = new PictureMarkerSymbol({
+            url: 'https://jimbarry.github.io/airports/images/' + aircraftType + '.png',
+            width: mrk_size,
+            height: mrk_size
+          });
+          return pms;
+        }
+
+        // make array of unique value infos
+        var uvi = [];
+        for (i=0; i<arrayModels.length ;i++) {
+          var str = arrayModels[i]
+          var eachUvi = {value: str, symbol: makeAircraftSymbol(str)};
+          uvi.push(eachUvi);
+        }
+
+        // rotate aircraft markers using field value
+        var rv = new RotationVariable({
+          field: 'Rotation',
+          rotationType: 'geographic'
         })
 
-      }); // END OF REQUIRE
-    </script>
-  </head>
+        // renderer for aircraft layer
+        var uvr = new UniqueValueRenderer({
+          field: 'Model',
+          visualVariables: rv,
+          uniqueValueInfos: uvi
+        });
 
-  <body>
-    <div id="viewDiv"></div>
-  </body>
+        planeLayer.renderer = uvr;
+
+      } // end of function: renderAircraft()
+
+
+
+    });
+  </script>
+
+</body>
 </html>
-
-<!--
-/users/jimba/library/Application Support/Microsoft/Teams/Backgrounds/Uploads
-  -->
