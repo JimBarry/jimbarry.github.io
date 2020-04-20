@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
   <meta name="description" content="ArcGIS JS v4, Calcite Maps and Bootstrap Example">
  
-  <title>ArcGIS JS v4, Calcite Maps and Bootstrap Example</title>
+  <title>Phoenix Sky Harbor</title>
 
   <!-- Calcite Maps Bootstrap -->
   <link rel="stylesheet" href="https://esri.github.io/calcite-maps/dist/css/calcite-maps-bootstrap.min-v0.10.css">
@@ -44,16 +44,20 @@
         </div>
       </a>
       <ul class="dropdown-menu" role="menu">
+        <!--
         <li><a role="menuitem" tabindex="0" data-target="#panelInfo" aria-haspopup="true"><span class="glyphicon glyphicon-info-sign"></span> About</a></li>
+        -->
         <li><a role="menuitem" tabindex="0" href="#" data-target="#panelLegend" aria-haspopup="true"><span class="glyphicon glyphicon-list-alt"></span> Legend</a></li>
         <li><a role="menuitem" tabindex="0" href="#" id="calciteToggleNavbar" aria-haspopup="true"><span class="glyphicon glyphicon-fullscreen"></span> Full Map</a></li>
       </ul>
     </div>
     <!-- Title -->
     <div class="calcite-title calcite-overflow-hidden">
-      <span class="calcite-title-main">Calcite Maps</span>
+      <span class="calcite-title-main"><img src="https://jimbarry.github.io/airports/images/phx.png" width='140px' height='45px'></span>
       <span class="calcite-title-divider hidden-xs"></span>
-      <span class="calcite-title-sub hidden-xs">A Bootstrap theme for building modern map apps</span>
+      <span class="calcite-title-main">Phoenix Sky Harbor International Airport</span>
+      <span class="calcite-title-divider hidden-xs"></span>
+      <span class="calcite-title-sub hidden-xs">Aircraft Parking and Storage</span>
     </div>
     <!-- Nav -->
     <ul class="nav navbar-nav calcite-nav">
@@ -81,6 +85,7 @@
 
     <!-- Panel - Basemaps -->
 
+    <!--
     <div id="panelInfo" class="panel collapse in">
       <div id="headingInfo" class="panel-heading" role="tab">
         <div class="panel-title">
@@ -94,6 +99,7 @@
         </div>
      </div>
     </div>
+    -->
 
     <!-- Panel - Legend -->
 
@@ -120,14 +126,13 @@
       <b>Plane Selected:</b>
       <div id="selectedDiv">No Selection</div>
       <div id="sliderDiv"></div>
-      <button id="clearBtn">Clear</button>
+      <button id="closeDivBtn">Close</button>
   </div>
   <div id="inputDiv">
       <label for="layerInput">Please input a URL to a Feature Layer</label>
-      <!-- <input type="text" id="layerInput" name="layerInput"
-          value="https://services.arcgis.com/6I1ysurtNWNxkuwd/arcgis/rest/services/Planes/FeatureServer/0"> -->
+
       <input type="text" id="layerInput" name="layerInput"
-          value="https://services.arcgis.com/6I1ysurtNWNxkuwd/ArcGIS/rest/services/Aircraft_Storage/FeatureServer/0"><br><br>
+          value="https://services.arcgis.com/6I1ysurtNWNxkuwd/arcgis/rest/services/Aircraft_Storage/FeatureServer/0"><br><br>
       <button id="getLayerBtn">Submit</button>
   </div>
 
@@ -203,6 +208,7 @@
       "esri/widgets/BasemapToggle",
       "esri/widgets/ScaleBar",
       "esri/widgets/Attribution",
+      "esri/widgets/Expand",
 
       "esri/layers/FeatureLayer", 
       "esri/renderers/UniqueValueRenderer",
@@ -219,7 +225,7 @@
       "calcite-maps/calcitemaps-arcgis-support-v0.10",
 
       "dojo/domReady!"
-    ], function(Map, MapView, Editor, Slider, Home, Zoom, Compass, Search, Legend, BasemapToggle, ScaleBar, Attribution, FeatureLayer, UniqueValueRenderer, RotationVariable, PictureMarkerSymbol, Collapse, Dropdown, CalciteMaps, CalciteMapArcGISSupport) {
+    ], function(Map, MapView, Editor, Slider, Home, Zoom, Compass, Search, Legend, BasemapToggle, ScaleBar, Attribution, Expand, FeatureLayer, UniqueValueRenderer, RotationVariable, PictureMarkerSymbol, Collapse, Dropdown, CalciteMaps, CalciteMapArcGISSupport) {
 
       /******************************************************************
        *
@@ -227,12 +233,26 @@
        * 
        ******************************************************************/
 
-      var value, planeLayer, planeGraphic, highlightSelect, planeLayerView;
+      var value, planeLayer, planeGraphic, highlightSelect, planeLayerView, editor, features;
+
+      var rotateOn = false;
 
       var scaleSizes = new Array(25);
       scaleSizes[16] = "40px";
       scaleSizes[17] = "80px";
       scaleSizes[18] = "160px";
+
+      const editPlaneAction = {
+          title: "Edit Plane Info",
+          id: "edit-plane",
+          className: "esri-icon-edit"
+      };
+
+      const rotatePlaneAction = {
+          title: "Rotate Plane",
+          id: "rotate-plane",
+          className: "esri-icon-rotate"
+      };
 
       // add, remove, modify aircraft "Models" here; put them in any order
       var arrayModels = [
@@ -312,11 +332,25 @@
         view: mapView
       });
 
-
       mapView.watch('zoom', function (evt) {
           console.log(evt)
           renderAircraft();
       })
+
+      mapView.ui.watch("components", function (evt) {
+          console.log(evt);
+      });
+
+      // Watch when the popup is visible
+      mapView.popup.watch("visible", function (event) {
+          // Check the Editor's viewModel state, if it is currently open and editing existing features, disable popups
+          if (editor.viewModel.state === "editing-existing-feature") {
+              mapView.popup.close();
+          } else {
+              // Grab the features of the popup
+              features = mapView.popup.features;
+          }
+      });
 
       var rotateSlider = new Slider({
           container: "sliderDiv",
@@ -348,7 +382,9 @@
                       { fieldName: "Rotation", label: "Rotation" }
                   ]
               }
-          ]
+          ],
+          actions: [editPlaneAction, rotatePlaneAction]
+
       }
 
       rotateSlider.on(["thumb-drag"], function (event) {
@@ -359,43 +395,51 @@
       })
 
 
-      document.getElementById("clearBtn").onclick = function () {
-          if (highlightSelect) {
-              highlightSelect.remove();
-          }
-          planeGraphic = null;
-          rotateSlider.values = [0];
-          document.getElementById("selectedDiv").innerText = "No Selection";
+      document.getElementById("closeDivBtn").onclick = function(){
+          rotateOn = false;
+          rotateSliderDiv.style.display = "none";
       }
 
-      document.getElementById("getLayerBtn").onclick = function () {
+      var rotateSliderDiv = document.getElementById("infoDiv");
 
-          
+      document.getElementById("getLayerBtn").onclick = function () {
           var url = document.getElementById("layerInput").value;
           planeLayer = new FeatureLayer({
               url: url,
               popupTemplate: template,
               outFields: ["*"]
           });
+
+          planeLayer.on("apply-edits", function () {
+              if (rotateOn == false) {
+                  // Once edits are applied to the layer, remove the Editor from the UI
+                  mapView.ui.remove(editor);
+                  editor.destroy();
+                  createEditor();
+              }
+          });
+
           map.add(planeLayer);
           planeLayer.when(function () {
               renderAircraft();
               return planeLayer.queryExtent()
           }).then(function (response) {
-              //mapView.goTo(response.extent);
 
-              let editor = new Editor({
-                  view: mapView
+              createEditor();
+
+              var addPlaneEditor = new Editor({
+                  view: mapView,
+                  allowedWorkflows: ["create"]
               });
-              // Add widget to top-right of the view
-              mapView.ui.add(editor, "top-right");
 
-              /* editor.watch("activeWorkflow", function (evt) {
-                  if(evt){
-                      evt.data.viewModel.sketchViewModel.pointSymbol = symbol;
-                  console.log(evt.data.viewModel.sketchViewModel.pointSymbol);
-                  }
-              }) */
+              var addPlaneEditor_Expand = new Expand({
+                  view: mapView,
+                  content:addPlaneEditor,
+                  expandTooltip: "Add New Plane"
+              })
+
+              mapView.ui.add(addPlaneEditor_Expand, "top-left");
+
 
               mapView.whenLayerView(planeLayer).then(function (layerView) {
                   planeLayerView = layerView;
@@ -405,6 +449,15 @@
       }
 
       mapView.when(function () {
+
+          mapView.popup.on("trigger-action", function (event) {
+              if (event.action.id === "edit-plane") {
+                  editPlane();
+              } else if (event.action.id === "rotate-plane") {
+                  rotatePlane()
+              }
+          });
+
           mapView.on("click", function (event) {
               mapView.hitTest(event).then(function (response) {
                   if (highlightSelect) {
@@ -462,7 +515,54 @@
 
       } // end of function: renderAircraft()
 
+      function editPlane() {
+          if (!editor.viewModel.activeWorkFlow) {
+              mapView.popup.visible = false;
 
+              editor.startUpdateWorkflowAtFeatureEdit(
+                  mapView.popup.selectedFeature
+              );
+              mapView.ui.add(editor, "top-right");
+          }
+
+          // We need to set a timeout to ensure the editor widget is fully rendered. We
+          // then grab it from the DOM stack
+          setTimeout(function () {
+              // Use the editor's back button as a way to cancel out of editing
+              let arrComp = editor.domNode.getElementsByClassName(
+                  "esri-editor__back-button esri-interactive"
+              );
+              if (arrComp.length === 1) {
+                  // Add a tooltip for the back button
+                  arrComp[0].setAttribute(
+                      "title",
+                      "Cancel edits, return to popup"
+                  );
+                  // Add a listerner to listen for when the editor's back button is clicked
+                  arrComp[0].addEventListener("click", function (evt) {
+                      // Prevent the default behavior for the back button and instead remove the editor and reopen the popup
+                      evt.preventDefault();
+                      mapView.ui.remove(editor);
+                      mapView.popup.open({
+                          features: features
+                      });
+                  });
+              }
+          }, 350);
+      }
+
+      function rotatePlane() {
+          rotateOn = true;
+          rotateSliderDiv.style.display = "block";
+          mapView.popup.close();
+      }
+
+      function createEditor() {
+          editor = new Editor({
+              view: mapView
+          });
+
+      }
 
     });
   </script>
