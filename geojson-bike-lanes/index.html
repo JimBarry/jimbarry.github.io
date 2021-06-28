@@ -31,13 +31,12 @@ https://github.com/JimBarry/arcgis-basic-geojsonlayer
       require([
         "esri/Map",
         "esri/views/MapView",
-        "esri/config",
         "esri/layers/FeatureLayer",
         "esri/layers/GeoJSONLayer",
         "esri/renderers/SimpleRenderer",
         "esri/symbols/SimpleLineSymbol",
         "esri/widgets/LayerList"
-      ], function(Map, MapView, esriConfig, FeatureLayer, GeoJSONLayer, SimpleRenderer, SimpleLineSymbol, LayerList) {
+      ], function(Map, MapView, FeatureLayer, GeoJSONLayer, SimpleRenderer, SimpleLineSymbol, LayerList) {
         
         // cross-domain resource for NYC Open Data site
         //esriConfig.request.corsEnabledServers.push("data.cityofnewyork.us");
