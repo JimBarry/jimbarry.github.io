@@ -1,0 +1,144 @@
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no">
+  <title>Routing REST with Fetch()</title>
+  <style>
+    html,
+    body
+  </style>	
+	
+</head>
+<body>
+  <div>
+    <h4>Origin Address</h4>
+    <input type="text" id="addresstb1" size=100 value="380 New York St, Redlands, CA, 92373"></input>
+  </div>
+  <div>
+    <h4>Destination Address</h4>
+    <input type="text" id="addresstb2" size=100 value="515 Orange St, Redlands, CA, 92373"></input>
+  </div>
+  <div>
+    <br><hr>
+	<button class="btn" id="btnFindRoute">Find Route</button>
+  </div>	
+  <div id="routeresults">
+    <h4>Results:</h4>
+  </div>
+  <div>
+    <hr>
+  </div>	
+  <div id="routedirections">
+    <h4>Directions:</h4>
+  </div>
+  
+<script>
+  
+// ***** SETUP PAGE AND TOOLS *****
+
+// API Key that turns on Geocoding and Routing  
+const apiKey = "AAPKbd4e54318a1a4070be76216861996ec2h-adN9G2qyMeoXaBw0MscyRVyvXqc-SbFCJDB9SDNDBre4H2StGZTaOowv-m5QFV"
+
+// page input elements
+var tbAddress1 = document.getElementById("addresstb1");
+var tbAddress2 = document.getElementById("addresstb2");
+var btnFindRoute = document.getElementById("btnFindRoute")
+btnFindRoute.addEventListener("click", findRoute);
+
+// async function so that we can use "await"
+async function findRoute() {
+
+  var url, response, jsonData;
+  var lon1, lat1, lon2, lat2;
+  var strStops;
+  var strFullAddress1 = tbAddress1.value;
+  var strFullAddress2 = tbAddress2.value;
+  
+  // ***** FIND ORIGIN ADDRESS LOCATION ***** 
+  
+  // build the REST GET request URL
+  url = "https://geocode.arcgis.com/arcgis/rest/services/World/GeocodeServer/findAddressCandidates?" +
+        "SingleLine=" + strFullAddress1 + "&token=" + apiKey + "&f=pjson";	
+			
+  // use "fetch()" to make the REST call
+  response = await fetch(url);
+  jsonData = await response.json();
+  
+  // get the lat/lon of the origin location
+  lat1 = jsonData.candidates[0].location.y.toString();
+  lon1 = jsonData.candidates[0].location.x.toString();
+  
+  // ***** FIND DESTINATION ADDRESS LOCATION ***** 
+  
+  // build the REST GET request URL
+  url = "https://geocode.arcgis.com/arcgis/rest/services/World/GeocodeServer/findAddressCandidates?" +
+        "SingleLine=" + strFullAddress2 + "&token=" + apiKey + "&f=pjson";			
+			
+  // use "fetch()" to make the REST call
+  response = await fetch(url);
+  jsonData = await response.json();
+
+  // get the lat/lon of the origin location  
+  lat2 = jsonData.candidates[0].location.y.toString();
+  lon2 = jsonData.candidates[0].location.x.toString();
+
+  // ***** FIND SHORTEST ROUTE FROM ORIGIN TO DESTINATION *****
+  
+  // build the stops parameter
+  strStops = lon1 + "," + lat1 + ";" + lon2 + "," + lat2;
+
+  // build the REST GET request URL
+  url = "https://route.arcgis.com/arcgis/rest/services/World/Route/NAServer/Route_World/solve?" +
+        "stops=" + strStops + "&token=" + apiKey + "&f=json";	
+
+  //console.log(url);
+			
+  // encode the URL
+  url = encodeURI(url);
+  
+  // use "fetch()" to make the REST call
+  response = await fetch(url);
+  jsonData = await response.json();
+  
+  // pull routing info out of the response json
+  var totalTravelTime = jsonData.routes.features[0].attributes.Total_TravelTime.toFixed(2);
+  var totalMiles = jsonData.routes.features[0].attributes.Total_Miles.toFixed(2);
+  
+  // ***** FORMAT THE RESULTS AND DISPLAY ON THE PAGE *****
+
+  // format the shortest path results
+  textContent = '<h4>Results:</h4>' +
+                '<p>' +
+				'<h4>Travel Time: ' + totalTravelTime + ' minutes</h4>' +
+                '<p>' +
+                '<h4>Distance: ' + totalMiles + ' miles</h4>';
+  
+  // display the shortest path results on the page
+  document.getElementById("routeresults").innerHTML = textContent;
+  
+  // ***** FORMAT THE DIRECTIONS AND DISPLAY ON THE PAGE *****
+  
+  // loop through each step of the directions, build directions page content
+  
+  var objDirections = jsonData.directions[0];
+  var arrayFeatures = objDirections.features;
+  var countFeatures = objDirections.features.length;
+  var strDirections = "";
+  var strDistance = "";
+  
+  for (i=0; i<countFeatures; i++) {
+    strDistance = arrayFeatures[i].attributes.length.toFixed(2);
+    strDirections = strDirections + 
+	                "<h5>After " + strDistance + " miles:  " +
+                    arrayFeatures[i].attributes.text + "</h5>";
+  }
+  document.getElementById("routedirections").innerHTML = strDirections;
+  
+} // end of function findRoute()
+
+
+</script>
+  
+</body>
+
+</html>
