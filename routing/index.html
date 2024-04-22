@@ -41,7 +41,7 @@
 
     // API KEY CONFIGURED TO ALLOW BASEMAPS AND ROUTING SERVICES
 	
-	myApiKey = "AAPKbd4e54318a1a4070be76216861996ec2h-adN9G2qyMeoXaBw0MscyRVyvXqc-SbFCJDB9SDNDBre4H2StGZTaOowv-m5QFV";
+    myApiKey = "AAPKbd4e54318a1a4070be76216861996ec2h-adN9G2qyMeoXaBw0MscyRVyvXqc-SbFCJDB9SDNDBre4H2StGZTaOowv-m5QFV";
     esriConfig.apiKey = myApiKey;
 
     // MAP AND MAPVIEW
@@ -57,16 +57,15 @@
       zoom: 10
     });
     
-	// WIDGETS
+    // WIDGETS
 	
     const ccWidget = new CoordinateConversion({
       view: view
     });
     view.ui.add(ccWidget, "bottom-left");
     
-	// LOCATION SERVICES ENDPOINTS
-	
-	const routeUrl = "https://route.arcgis.com/arcgis/rest/services/World/Route/NAServer/Route_World";
+    // LOCATION SERVICES ENDPOINTS
+    const routeUrl = "https://route.arcgis.com/arcgis/rest/services/World/Route/NAServer/Route_World";
 
 
     // BUTTON FUNCTIONS
@@ -121,65 +120,65 @@
 		directionsOutputType: "complete"
       });
 
-      // if the user selected a barrier, add it to the route parameters
-	  // (edited so that each selected barrier can have more than one polyline)
-	  var idx = dom.byId("selectBarriers").selectedIndex;
+     // if the user selected a barrier, add it to the route parameters
+  // (edited so that each selected barrier can have more than one polyline)
+  var idx = dom.byId("selectBarriers").selectedIndex;
 	  
-	  switch (idx) {
-	    case 0:
-		  break;
-	    case 1:
-	      var collBarriers1 = new Collection();
-		  var plBarrier1 = new Polyline({
-		    paths: arrayBarrier1
-		  });
-		  var plinebarrier1 = new PolylineBarrier({
-		    geometry: plBarrier1
-		  });
-		  collBarriers1.add(plinebarrier1);
-		  routeParams.polylineBarriers = collBarriers1;
-          break;		
-	    case 2:
-	      var collBarriers2 = new Collection();
-		  var plBarrier2 = new Polyline({
-		    paths: arrayBarrier2
-		  });
-		  var plinebarrier2 = new PolylineBarrier({
-		    geometry: plBarrier2
-		  });
-		  collBarriers2.add(plinebarrier2);
-		  routeParams.polylineBarriers = collBarriers2;
-          break;		        
-	    case 3:
-	      var collBarriers3 = new Collection();
-		  var plBarrier3 = new Polyline({
-		    paths: arrayBarrier3
-		  });
-		  var plinebarrier3 = new PolylineBarrier({
-		    geometry: plBarrier3
-		  });
-		  collBarriers3.add(plinebarrier3);
-		  routeParams.polylineBarriers = collBarriers3;
-          break;		     		  
-		case 4:
-	      var collBarriers4 = new Collection();
-		  var plBarrier4a = new Polyline({
-		    paths: arrayBarrier4a
-		  });
-		  var plinebarrier4a = new PolylineBarrier({
-		    geometry: plBarrier4a
-		  });
-		  collBarriers4.add(plinebarrier4a);
-		  var plBarrier4b = new Polyline({
-		    paths: arrayBarrier4b
-		  });
-		  var plinebarrier4b = new PolylineBarrier({
-		    geometry: plBarrier4b
-		  });
-		  collBarriers4.add(plinebarrier4b);
-		  routeParams.polylineBarriers = collBarriers4;
-          break;				
-	  }
+  switch (idx) {
+    case 0:
+	  break;
+    case 1:
+      var collBarriers1 = new Collection();
+	  var plBarrier1 = new Polyline({
+	    paths: arrayBarrier1
+	  });
+	  var plinebarrier1 = new PolylineBarrier({
+	    geometry: plBarrier1
+	  });
+	  collBarriers1.add(plinebarrier1);
+	  routeParams.polylineBarriers = collBarriers1;
+         break;		
+    case 2:
+      var collBarriers2 = new Collection();
+	  var plBarrier2 = new Polyline({
+	    paths: arrayBarrier2
+	  });
+	  var plinebarrier2 = new PolylineBarrier({
+	    geometry: plBarrier2
+	  });
+	  collBarriers2.add(plinebarrier2);
+	  routeParams.polylineBarriers = collBarriers2;
+         break;		        
+    case 3:
+      var collBarriers3 = new Collection();
+	  var plBarrier3 = new Polyline({
+	    paths: arrayBarrier3
+	  });
+	  var plinebarrier3 = new PolylineBarrier({
+	    geometry: plBarrier3
+	  });
+	  collBarriers3.add(plinebarrier3);
+	  routeParams.polylineBarriers = collBarriers3;
+         break;		     		  
+	case 4:
+      var collBarriers4 = new Collection();
+	  var plBarrier4a = new Polyline({
+	    paths: arrayBarrier4a
+	  });
+	  var plinebarrier4a = new PolylineBarrier({
+	    geometry: plBarrier4a
+	  });
+	  collBarriers4.add(plinebarrier4a);
+	  var plBarrier4b = new Polyline({
+	    paths: arrayBarrier4b
+	  });
+	  var plinebarrier4b = new PolylineBarrier({
+	    geometry: plBarrier4b
+	  });
+	  collBarriers4.add(plinebarrier4b);
+	  routeParams.polylineBarriers = collBarriers4;
+         break;				
+  }
 
 	  // find the shortest route path through all stops
       route.solve(routeUrl, routeParams)
