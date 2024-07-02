@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no" />
+    <title>TextSymbol lineWidth property test</title>
+
+    <link rel="stylesheet" href="https://js.arcgis.com/4.30/esri/themes/light/main.css" />
+    <script src="https://js.arcgis.com/4.30/"></script>
+
+    <style>
+      html,
+      body,
+      #viewDiv {padding:0;margin:0;height:97%;width:100%;}
+    </style>
+
+    <script>
+      require([
+	    "esri/config",
+        "esri/Map",
+        "esri/views/MapView",
+		"esri/geometry/Point",
+		"esri/Graphic",
+		"esri/symbols/TextSymbol",
+		"esri/symbols/SimpleMarkerSymbol"
+      ], function(esriConfig, Map, MapView, Point, Graphic, TextSymbol, SimpleMarkerSymbol) {
+	  
+	    const arrayApiKey = ["AAPTxy8BH1VEsoebNVZXo8HurK3394tAlRSlVPCFzlelE82bRZU9", 
+							 "yENQaqTgRR1jwtb1MbZYEp2Xke0ARZHkeddMW2C2BSexiydQlA",
+							 "IrAiLyKPVAhChI-Clpqn5qhxOzdJ8sVupm8NgpEcB4QCAJe6Jk", 
+							 "lOEWbFXOG-WiOXqBEP3F_d8zzpJfUPjAdJZip6ZN2hVz2bOMVY", 
+							 "x-qtVkgsx1Au2RbN6_Dkh6V7PzaBmgthmTe5A.AT1_EFrt9bH1"];
+		var strApiKey = "";
+		for (i=0;i<5;i++){strApiKey = strApiKey + arrayApiKey[i]}
+		esriConfig.apiKey = strApiKey;
+		
+		// map
+        const map = new Map({
+          basemap: "gray"
+        });
+        
+		// 2D map view
+        const mapView = new MapView({
+          container: "viewDiv",
+          map: map,
+          zoom: 10,
+          center: [-73.8, 41] 
+        });
+		
+		// text symbol for the label to draw
+		const tsymLongText = new TextSymbol({
+		  text: "Test label text",
+          color: "red",
+		  horizontalAlignment: "left",
+		  verticalAlignment: "top",
+		  lineWidth: "192px",
+          font: {size: 12, family: "Arial"}		  
+		});
+		
+		// marker symbol for the text label insertion point
+		const smsInsertText = new SimpleMarkerSymbol({
+		  style: "cross",
+		  outline: {color: "red"},
+		  size: "20px"
+		});
+        
+        function drawTextOnMap() {
+		
+		  // clear graphics layer
+		  mapView.graphics.removeAll();
+		  
+		  // configure text label properties
+		  tsymLongText.text = document.getElementById("drawtext-input").value
+		  tsymLongText.lineWidth = document.getElementById("linewidth-input").value;
+		  tsymLongText.font = {size: document.getElementById("fontsize-input").value, family: "Arial"};
+		  
+		  // establish label position
+  	      let x = mapView.extent.xmin + (mapView.extent.width * 0.1);
+		  let y = mapView.extent.ymax - (mapView.extent.height * 0.3);		  
+		  let ptInsertText = new Point({x: x, y: y, spatialReference: {wkid: 3857}});
+		  
+		  // create a draw graphics
+		  let gText = new Graphic({geometry: ptInsertText, symbol: tsymLongText});
+		  let gPt = new Graphic({geometry: ptInsertText, symbol: smsInsertText});
+		  mapView.graphics.addMany([gPt, gText]);  
+        
+		} // end of function drawTextOnMap()
+
+        // BUTTONS
+        const btnDrawText = document.getElementById("btnDrawText");
+		btnDrawText.addEventListener("click", drawTextOnMap);
+    
+      }); //end of require
+    </script>
+  </head>
+
+  <body>
+    <div>
+      <input type="text" id="drawtext-input" size=110 
+	  value="Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.">
+	  </input>    
+	</div>
+	<div>
+	  ||   ||
+      <input type="text" id="fontsize-input" size=3 value="12"> Font Size</input> 
+      ||   ||	  
+      <input type="text" id="linewidth-input" size=3 value="192"> Max Line Width</input>    
+      ||   ||	  
+      <button class="btn" id="btnDrawText">DrawText</button>
+	</div>
+    <div id="viewDiv"></div>
+  </body>
+
+</html>
