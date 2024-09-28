@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="initial-scale=1,maximum-scale=1,user-scalable=no"
+    />
+    <title>FeatureLayer Clustering</title>
+
+    <link
+      rel="stylesheet"
+      href="https://js.arcgis.com/4.30/esri/themes/light/main.css"
+    />
+    <script src="https://js.arcgis.com/4.30/"></script>
+
+    <style>
+      html,
+      body,
+      #viewDiv {
+        padding: 0;
+        margin: 0;
+        height: 100%;
+        width: 100%;
+      }
+    </style>
+
+    <script>
+      require([
+	    "esri/config",
+        "esri/Map",
+        "esri/views/MapView",
+        "esri/layers/FeatureLayer",
+		"esri/layers/support/FeatureReductionCluster",
+		"esri/symbols/TextSymbol",
+		"esri/layers/support/LabelClass"
+      ], function(esriConfig, Map, MapView, FeatureLayer, FeatureReductionCluster, TextSymbol, LabelClass) {
+
+        esriConfig.apiKey = "AAPK3dbcd91d41ea44278c784dafaf7f77f4aRIhgE9q9TMkJq6EiOxx-QN8-q3X0OBh44FGQMvpHk_fyQflN3_Ikttnn5fu5SUL";
+		
+        var map = new Map({
+          basemap: "arcgis/dark-gray"
+          //basemap: "osm"
+        });
+
+        var mapView = new MapView({
+          container: "viewDiv",
+          map: map,
+          zoom: 10,
+          center: [-73.99, 40.73] 
+        });
+
+        var tsym = new TextSymbol({
+		  color: "white",
+          font: {size: "8px"}		  
+		});
+		
+		var lc = new LabelClass({
+		  sym: tsym,
+		  labelExpressionInfo: {expression: "$feature.cluster_count"},
+		  deconflictionStrategy: "none",
+		  labelPlacement: "center-center",		  
+		});
+        
+        var frc = new FeatureReductionCluster({
+		  clusterRadius: 100,
+		  popupEnabled: true,
+		  labelingInfo: [lc]	  
+		});
+
+        // FeatureLayers
+        var flAug1 = new FeatureLayer({
+		    portalItem: {id: "b4341f0909cc4b40a14dbca6dac8bb1e"},
+          featureReduction: frc
+        });
+        map.add(flAug1);
+        var flAug2 = new FeatureLayer({
+		  portalItem: {id: "2c489cfe4ee140e2923a9d3cfd5a931c"},
+          featureReduction: frc
+        });
+        map.add(flAug2);
+        var flAug3 = new FeatureLayer({
+		  portalItem: {id: "b0b1f20503f043fdb3843d4bdd3810cf"},
+          featureReduction: frc
+        });
+        map.add(flAug3);
+         
+      });
+    </script>
+  </head>
+
+  <body>
+    <div id="viewDiv"></div>
+  </body>
+</html>
