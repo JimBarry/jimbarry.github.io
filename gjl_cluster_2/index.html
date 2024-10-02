@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="initial-scale=1,maximum-scale=1,user-scalable=no"
+    />
+    <title>GeoJSONLayer Clustering</title>
+
+    <link
+      rel="stylesheet"
+      href="https://js.arcgis.com/4.30/esri/themes/light/main.css"
+    />
+    <script src="https://js.arcgis.com/4.30/"></script>
+
+    <style>
+      html,
+      body,
+      #viewDiv {
+        padding: 0;
+        margin: 0;
+        height: 98%;
+        width: 100%;
+      }
+    </style>
+
+    <script>
+      require([
+	    "esri/config",
+        "esri/Map",
+        "esri/views/MapView",
+        "esri/layers/GeoJSONLayer",
+		"esri/layers/FeatureLayer",
+		"esri/layers/support/FeatureReductionCluster",
+		"esri/symbols/TextSymbol",
+		"esri/layers/support/LabelClass",
+		"esri/renderers/SimpleRenderer",
+		"esri/symbols/SimpleMarkerSymbol",
+		"esri/widgets/LayerList",
+		"esri/widgets/Legend",
+		"esri/PopupTemplate"
+		
+      ], function(esriConfig, Map, MapView, GeoJSONLayer, FeatureLayer, 
+	              FeatureReductionCluster, TextSymbol, LabelClass, 
+				  SimpleRenderer, SimpleMarkerSymbol, LayerList, 
+				  Legend, PopupTemplate) {
+        
+		// API Key 
+        
+		esriConfig.apiKey = "AAPK3dbcd91d41ea44278c784dafaf7f77f4aRIhgE9q9TMkJq6EiOxx-QN8-q3X0OBh44FGQMvpHk_fyQflN3_Ikttnn5fu5SUL";
+		
+		// map
+        
+		var map = new Map({
+          basemap: "arcgis/dark-gray"
+          //basemap: "osm"
+        });
+        var mapView = new MapView({
+          container: "viewDiv",
+          map: map,
+          zoom: 11,
+          center: [-73.98, 40.67] 
+        });
+        
+		//symbology
+		
+		var smsRed = new SimpleMarkerSymbol({
+		  style: "circle",
+		  color: "red",
+		  size: "5px",
+		  outline: null
+		});
+		var smsGreen = new SimpleMarkerSymbol({
+		  style: "circle",
+		  color: "green",
+		  size: "5px",
+		  outline: null
+		});		
+		var smsBlue = new SimpleMarkerSymbol({
+		  style: "circle",
+		  color: "blue",
+		  size: "5px",
+		  outline: null
+		});
+		
+		var srRed = new SimpleRenderer({
+		  symbol: smsRed
+		});
+		var srGreen = new SimpleRenderer({
+		  symbol: smsGreen
+		});		
+		var srBlue = new SimpleRenderer({
+		  symbol: smsBlue
+		});        
+		
+		var tsym = new TextSymbol({
+		  color: "white",
+          font: {size: "8px"}		  
+		});
+		
+		var lc = new LabelClass({
+		  sym: tsym,
+		  labelExpressionInfo: {expression: "$feature.cluster_count"},
+		  deconflictionStrategy: "none",
+		  labelPlacement: "center-center",		  
+		});
+        
+        var frc = new FeatureReductionCluster({
+		  clusterRadius: 100,
+		  popupEnabled: true,
+		  labelingInfo: [lc]	  
+		});
+		
+		// popup template
+		
+        popupSystems = {
+		  title: "Fiber Info",
+		  content: [
+		    {
+		      type: "fields",
+			  fieldInfos: [
+			    {
+			      fieldName: "Incident Address",
+			      label: "Address"
+			    },
+                {
+                  fieldName: "Status",
+                  label: "Status"		
+                },
+				{
+				  fieldName: "Created Date",
+				  label: "Date Reported"
+				}  
+			  ]	
+            }
+          ]			   		
+		}; // end of popup template configuration
+
+        // layers
+		
+		var flFibers = new FeatureLayer({
+		  url: "https://services5.arcgis.com/LGTJWfnE6CJdd5tX/arcgis/rest/services/NYC_MTA_BUS_ROUTES/FeatureServer/2",
+		  title: 'Fibers'
+		});		
+		map.add(flFibers);
+        var gjlAug1 = new GeoJSONLayer({
+		  url: "https://jimbarry.github.io/json-files/Aug1_311_gj.geojson",
+		  title: "ONT",
+		  renderer: srRed,
+          featureReduction: frc,
+		  popupTemplate: popupSystems,
+		  definitionExpression: "OBJECTID < 3000"
+        });
+        map.add(gjlAug1);
+        var gjlAug2 = new GeoJSONLayer({
+		  url: "https://jimbarry.github.io/json-files/Aug2_311_gj.geojson",
+		  title: "OLT",
+		  renderer: srGreen,
+          featureReduction: frc,
+		  popupTemplate: popupSystems,
+		  definitionExpression: "OBJECTID < 3000"
+        });
+        map.add(gjlAug2);
+        var gjlAug3 = new GeoJSONLayer({
+		  url: "https://jimbarry.github.io/json-files/Aug3_311_gj.geojson",
+		  title: "RG",
+		  renderer: srBlue,
+          featureReduction: frc,
+		  popupTemplate: popupSystems,
+		  definitionExpression: "OBJECTID < 3000"
+        });
+        map.add(gjlAug3);
+		
+		// UI functions
+		
+		function toggleHealthy(){
+		  if(chkToggleHealthy.checked == true){
+            gjlAug1.definitionExpression = "OBJECTID < 3000";
+            gjlAug2.definitionExpression = "OBJECTID < 3000";
+            gjlAug3.definitionExpression = "OBJECTID < 3000";
+		  } else {
+            gjlAug1.definitionExpression = "";
+            gjlAug2.definitionExpression = "";
+            gjlAug3.definitionExpression = "";
+		  }
+		}
+		
+		// UI elements
+		
+		var widgetLayerList = new LayerList({
+		  view: mapView
+		});
+		mapView.ui.add(widgetLayerList, {position: 'bottom-left'});
+
+        var chkToggleHealthy = document.getElementById("chkToggleHealthy")
+        chkToggleHealthy.addEventListener("click", toggleHealthy);   
+
+
+		//var widgetLegend = new Legend({
+		//  view: mapView
+		//});
+		//mapView.ui.add(widgetLegend, {position: 'bottom-right'});
+         
+      });
+    </script>
+  </head>
+
+  <body>
+    <div id="definitionToggle">
+	  <input type="checkbox" id="chkToggleHealthy" checked>
+	  <label for="chkToggleHealthy">Hide Healthy Systems</label>
+	</div>
+    <div id="viewDiv"></div>
+  </body>
+</html>
