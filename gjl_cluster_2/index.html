@@ -60,6 +60,32 @@
           zoom: 11,
           center: [-73.98, 40.67] 
         });
+
+		
+	// popup template
+		
+	popupSystems = {
+  	  title: "Fiber Info",
+  	  content: [
+    	    {
+      	      type: "fields",
+	      fieldInfos: [
+		{
+	  	  fieldName: "Incident Address",
+          	  label: "Address"
+		},
+		{
+          	  fieldName: "Status",
+          	  label: "Status"		
+        	},	 
+		{
+	  	  fieldName: "Created Date",
+	  	  label: "Date Reported"
+		}  
+  	      ]	
+     	    }
+  	  ]			   		
+	}; // end of popup template configuration
         
 	//symbology
 	
@@ -106,34 +132,10 @@
         
         var frc = new FeatureReductionCluster({
 	  clusterRadius: 100,
+	  popupTemplate: popupSystems,
 	  popupEnabled: true,
 	  labelingInfo: [lc]	  
 	});
-		
-	// popup template
-		
-	popupSystems = {
-  	  title: "Fiber Info",
-  	  content: [
-    	    {
-      	      type: "fields",
-	      fieldInfos: [
-		{
-	  	  fieldName: "Incident Address",
-          	  label: "Address"
-		},
-		{
-          	  fieldName: "Status",
-          	  label: "Status"		
-        	},	 
-		{
-	  	  fieldName: "Created Date",
-	  	  label: "Date Reported"
-		}  
-  	      ]	
-     	    }
-  	  ]			   		
-	}; // end of popup template configuration
 
         // layers
 		
