@@ -32,58 +32,62 @@
     	"esri/views/MapView",
     	"esri/layers/GeoJSONLayer",
     	"esri/layers/FeatureLayer",
-	"esri/layers/support/FeatureReductionCluster",
-	"esri/symbols/TextSymbol",
-	"esri/layers/support/LabelClass",
-	"esri/renderers/SimpleRenderer",
-	"esri/symbols/SimpleMarkerSymbol",
-	"esri/widgets/LayerList",
-	"esri/widgets/Legend",
-	"esri/PopupTemplate"
+		"esri/layers/support/FeatureReductionCluster",
+		"esri/symbols/TextSymbol",
+		"esri/layers/support/LabelClass",
+		"esri/renderers/SimpleRenderer",
+		"esri/symbols/SimpleMarkerSymbol",
+		"esri/widgets/LayerList",
+		"esri/widgets/Legend",
+		"esri/PopupTemplate",
+		"esri/rest/support/Query"
 		
       ], function(esriConfig, Map, MapView, GeoJSONLayer, FeatureLayer, 
 	        FeatureReductionCluster, TextSymbol, LabelClass, 
-		SimpleRenderer, SimpleMarkerSymbol, LayerList, 
-		Legend, PopupTemplate) {
+			SimpleRenderer, SimpleMarkerSymbol, LayerList, 
+			Legend, PopupTemplate, Query) {
         
+	// Globals
+	var str5percent = "OBJECTID < 3000";
+	
 	// API Key 
-        esriConfig.apiKey = "AAPK3dbcd91d41ea44278c784dafaf7f77f4aRIhgE9q9TMkJq6EiOxx-QN8-q3X0OBh44FGQMvpHk_fyQflN3_Ikttnn5fu5SUL";
+    esriConfig.apiKey = "AAPK3dbcd91d41ea44278c784dafaf7f77f4aRIhgE9q9TMkJq6EiOxx-QN8-q3X0OBh44FGQMvpHk_fyQflN3_Ikttnn5fu5SUL";
 		
 	// map
-        var map = new Map({
-          basemap: "arcgis/dark-gray"
-          //basemap: "osm"
-        });
-        var mapView = new MapView({
-          container: "viewDiv",
-          map: map,
-          zoom: 11,
-          center: [-73.98, 40.67] 
-        });
+    var map = new Map({
+      basemap: "arcgis/dark-gray"
+      //basemap: "osm"
+    });
+	
+    var mapView = new MapView({
+      container: "viewDiv",
+      map: map,
+      zoom: 11,
+      center: [-73.98, 40.67] 
+    });
 
-		
 	// popup template
 		
 	popupSystems = {
   	  title: "Fiber Info",
   	  content: [
-    	    {
-      	      type: "fields",
+    	{
+      	  type: "fields",
 	      fieldInfos: [
-		{
-	  	  fieldName: "Incident Address",
-          	  label: "Address"
-		},
-		{
-          	  fieldName: "Status",
-          	  label: "Status"		
-        	},	 
-		{
-	  	  fieldName: "Created Date",
-	  	  label: "Date Reported"
-		}  
+			{
+			  fieldName: "Incident Address",
+			  label: "Address"
+			},
+			{
+			  fieldName: "Status",
+			  label: "Status"		
+			},	 
+			{
+			  fieldName: "Created Date",
+			  label: "Date Reported"
+			}  
   	      ]	
-     	    }
+     	}
   	  ]			   		
 	}; // end of popup template configuration
         
@@ -95,12 +99,14 @@
 	  size: "5px",
 	  outline: null
 	});
+	
 	var smsGreen = new SimpleMarkerSymbol({
 	  style: "circle",
 	  color: "green",
 	  size: "5px",
 	  outline: null
 	});		
+	
 	var smsBlue = new SimpleMarkerSymbol({
 	  style: "circle",
 	  color: "blue",
@@ -111,9 +117,11 @@
 	var srRed = new SimpleRenderer({
 	  symbol: smsRed
 	});
+	
 	var srGreen = new SimpleRenderer({
 	  symbol: smsGreen
 	});		
+	
 	var srBlue = new SimpleRenderer({
 	  symbol: smsBlue
 	});        
@@ -130,14 +138,14 @@
 	  labelPlacement: "center-center",		  
 	});
         
-        var frc = new FeatureReductionCluster({
+    var frc = new FeatureReductionCluster({
 	  clusterRadius: 100,
 	  popupTemplate: popupSystems,
 	  popupEnabled: true,
 	  labelingInfo: [lc]	  
 	});
 
-        // layers
+    // layers
 		
 	var flFibers = new FeatureLayer({
 	  url: "https://services5.arcgis.com/LGTJWfnE6CJdd5tX/arcgis/rest/services/NYC_MTA_BUS_ROUTES/FeatureServer/2",
@@ -145,47 +153,76 @@
 	  visible: false
 	});		
 	map.add(flFibers);
-        var gjlAug1 = new GeoJSONLayer({
+	
+    var gjlAug1 = new GeoJSONLayer({
 	  url: "https://jimbarry.github.io/json-files/Aug1_311_gj.geojson",
 	  title: "ONT",
 	  renderer: srRed,
  	  featureReduction: frc,
 	  popupTemplate: popupSystems,
-	  definitionExpression: "OBJECTID < 3000"
-        });
-        map.add(gjlAug1);
-        var gjlAug2 = new GeoJSONLayer({
+	  definitionExpression: str5percent
+    });
+    map.add(gjlAug1);
+	
+    var gjlAug2 = new GeoJSONLayer({
 	  url: "https://jimbarry.github.io/json-files/Aug2_311_gj.geojson",
 	  title: "OLT",
 	  renderer: srGreen,
-          featureReduction: frc,
+      featureReduction: frc,
 	  popupTemplate: popupSystems,		  
-	  definitionExpression: "OBJECTID < 3000"
-        });
-        map.add(gjlAug2);
-        var gjlAug3 = new GeoJSONLayer({
+	  definitionExpression: str5percent
+    });
+    map.add(gjlAug2);
+	
+    var gjlAug3 = new GeoJSONLayer({
 	  url: "https://jimbarry.github.io/json-files/Aug3_311_gj.geojson",
 	  title: "RG",
 	  renderer: srBlue,
-          featureReduction: frc,
+      featureReduction: frc,
 	  popupTemplate: popupSystems,
-	  definitionExpression: "OBJECTID < 3000"
-        });
-        map.add(gjlAug3);
+	  definitionExpression: str5percent
+    });
+    map.add(gjlAug3);
 		
-		// UI functions
+	// UI functions
 		
 	function toggleHealthy(){
+	
 	  if(chkToggleHealthy.checked == true){
-            gjlAug1.definitionExpression = "OBJECTID < 3000";
-            gjlAug2.definitionExpression = "OBJECTID < 3000";
-            gjlAug3.definitionExpression = "OBJECTID < 3000";
+        gjlAug1.definitionExpression = str5percent;
+        gjlAug2.definitionExpression = str5percent;
+        gjlAug3.definitionExpression = str5percent;
 	  } else {
-            gjlAug1.definitionExpression = "";
-            gjlAug2.definitionExpression = "";
-            gjlAug3.definitionExpression = "";
+        gjlAug1.definitionExpression = "";
+        gjlAug2.definitionExpression = "";
+        gjlAug3.definitionExpression = "";
 	  }
+	  
 	} // end of function toggleHealthy()
+		
+	function countFeatures(){
+	
+	  var strQuery = "1=1";
+	  if (chkToggleHealthy.checked) {
+	    strQuery = str5percent;
+	  }	
+	  
+      var query = new Query();
+      query.where = strQuery; 
+      var countTotal = 0;
+	  
+      gjlAug1.queryFeatureCount(query).then(function(result) {
+        countTotal = countTotal + result;
+		gjlAug2.queryFeatureCount(query).then(function(result) {
+          countTotal = countTotal + result;
+		  gjlAug3.queryFeatureCount(query).then(function(result) {
+            countTotal = countTotal + result;
+			alert("Total feature count:  " + countTotal.toString());
+		  });	
+        });  
+      });
+	  
+    } // end of function btnFeatureCount()
 		
 	// UI elements
 		
@@ -194,17 +231,22 @@
 	});
 	mapView.ui.add(widgetLayerList, {position: 'bottom-left'});
 
-        var chkToggleHealthy = document.getElementById("chkToggleHealthy")
-        chkToggleHealthy.addEventListener("click", toggleHealthy);   
+    var chkToggleHealthy = document.getElementById("chkToggleHealthy")
+    chkToggleHealthy.addEventListener("click", toggleHealthy);   
          
-      }); // end of require
+	var btnFeatureCount = document.getElementById("btnFeatureCount")
+    btnFeatureCount.addEventListener("click", countFeatures);   
+	
+    }); // end of require
+	
     </script>
   </head>
 
   <body>
     <div id="definitionToggle">
 	  <input type="checkbox" id="chkToggleHealthy" checked>
-	  <label for="chkToggleHealthy">Hide Healthy Systems  ||  Total Systems Displayed: xx,xxx</label>
+	  <label for="chkToggleHealthy">Hide Healthy Systems</label>
+	  <button type="button" id="btnFeatureCount">Count</button>
 	</div>
     <div id="viewDiv"></div>
   </body>
