@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="initial-scale=1,maximum-scale=1,user-scalable=no"
+    />
+    <title>Cluster count issue</title>
+
+    <link
+      rel="stylesheet"
+      href="https://js.arcgis.com/4.30/esri/themes/light/main.css"
+    />
+    <script src="https://js.arcgis.com/4.30/"></script>
+
+    <style>
+      html,
+      body,
+      #viewDiv {
+        padding: 0;
+        margin: 0;
+        height: 98%;
+        width: 100%;
+      }
+    </style>
+
+    <script>
+      require([
+    	"esri/config",
+    	"esri/Map",
+    	"esri/views/MapView",
+    	"esri/layers/GeoJSONLayer",
+    	"esri/layers/FeatureLayer",
+		"esri/layers/support/FeatureReductionCluster",
+		"esri/symbols/TextSymbol",
+		"esri/layers/support/LabelClass",
+		"esri/renderers/SimpleRenderer",
+		"esri/symbols/SimpleMarkerSymbol",
+		"esri/widgets/LayerList",
+		"esri/PopupTemplate"
+		
+      ], function(esriConfig, Map, MapView, GeoJSONLayer, FeatureLayer, 
+	        FeatureReductionCluster, TextSymbol, LabelClass, 
+			SimpleRenderer, SimpleMarkerSymbol, LayerList, PopupTemplate) {
+        
+	// Globals
+	
+	// API Key 
+	
+    esriConfig.apiKey = "AAPK3dbcd91d41ea44278c784dafaf7f77f4aRIhgE9q9TMkJq6EiOxx-QN8-q3X0OBh44FGQMvpHk_fyQflN3_Ikttnn5fu5SUL";
+		
+	// map and mapview
+	
+    var map = new Map({
+      basemap: "arcgis/dark-gray"
+    });
+	
+    var mapView = new MapView({
+      container: "viewDiv",
+      map: map,
+      zoom: 11,
+      center: [-73.98, 40.67] 
+    });
+
+	// popup template
+		
+	popupSystems = {
+  	  title: "Fiber Info",
+  	  content: [
+    	{
+      	  type: "fields",
+	      fieldInfos: [
+			{
+			  fieldName: "Incident Address",
+			  label: "Address"
+			},
+			{
+			  fieldName: "Status",
+			  label: "Status"		
+			},	 
+			{
+			  fieldName: "Created Date",
+			  label: "Date Reported"
+			}  
+  	      ]	
+     	}
+  	  ]			   		
+	}; // end of popup template configuration
+        
+	//symbology
+	
+	var smsRed = new SimpleMarkerSymbol({
+	  style: "circle",
+	  color: "red",
+	  size: "6px",
+	  outline: null
+	});
+	
+	var smsGreen = new SimpleMarkerSymbol({
+	  style: "circle",
+	  color: "green",
+	  size: "6px",
+	  outline: null
+	});		
+		
+	var srRed = new SimpleRenderer({
+	  symbol: smsRed
+	});
+	
+	var srGreen = new SimpleRenderer({
+	  symbol: smsGreen
+	});		
+	
+	var tsym = new TextSymbol({
+	  color: "white",
+      font: {size: "8px"}		  
+	});
+		
+	var lc = new LabelClass({
+	  sym: tsym,
+	  labelExpressionInfo: {expression: "$feature.cluster_count"},
+	  deconflictionStrategy: "none",
+	  labelPlacement: "center-center",		  
+	});
+        
+    var frc = new FeatureReductionCluster({
+	  clusterRadius: 100,
+	  popupTemplate: popupSystems,
+	  popupEnabled: true,
+	  labelingInfo: [lc]	  
+	});
+
+    // layers
+	
+    var gjl = new GeoJSONLayer({
+	  url: "https://jimbarry.github.io/json-files/Aug1_311_gj.geojson",
+	  title: "GeoJSONLayer",
+	  renderer: srRed,
+ 	  featureReduction: frc,
+	  popupTemplate: popupSystems
+	});
+    map.add(gjl);
+	
+    var fl = new FeatureLayer({
+	  url: "https://services9.arcgis.com/hsPsr2XddCBblVhb/arcgis/rest/services/Aug2_311/FeatureServer/0",
+	  title: "FeatureLayer",
+	  renderer: srGreen,
+      featureReduction: frc,
+	  popupTemplate: popupSystems
+    });
+    map.add(fl);
+		
+	// UI functions
+	
+	function addOneToClusterLabel() {
+	
+	  try {
+	    var intIncrement = chkAddOne.checked ? '1' : '0';
+	  } finally {
+	    lc.labelExpressionInfo = {expression: "$feature.cluster_count + " + intIncrement}
+		frc.labelingInfo = [lc];
+		gjl.featureReduction = frc;
+		fl.featureReduction = frc;	  
+	  }
+	
+	} // end of function addOneToClusterLabel()
+		
+	// UI elements
+		
+	var widgetLayerList = new LayerList({
+	  view: mapView
+	});
+	mapView.ui.add(widgetLayerList, {position: 'bottom-left'});
+	
+	var chkAddOne = document.getElementById("chkAddOne")
+    chkAddOne.addEventListener("click", addOneToClusterLabel);   
+	
+    }); // end of require
+	
+    </script>
+  </head>
+
+  <body>
+    <div>
+	  <input type="checkbox" id="chkAddOne">WORKAROUND!! -> Add One to cluster label</input>
+	</div>
+    <div id="viewDiv"></div>
+  </body>
+</html>
