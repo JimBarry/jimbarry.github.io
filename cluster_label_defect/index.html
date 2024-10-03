@@ -63,9 +63,9 @@
           center: [-73.98, 40.67]
         });
 
-        // popup template
+        // popup templates
 
-        popupSystems = {
+        popupLayer = {
           title: "Fiber Info",
           content: [{
             type: "fields",
@@ -83,7 +83,22 @@
               }
             ]
           }]
-        }; // end of popup template configuration
+        }; 
+		
+	popupCluster = {
+	  title: "Cluster summary",
+	  content: [
+		{
+		  type: "fields",
+		  fieldInfos: [
+			{
+			  fieldName: "cluster_count",
+			  label: "Cluster count",
+			},
+		  ],
+		},
+	  ],
+	}
 
         //symbology
 
@@ -123,7 +138,7 @@
 
         var frc = new FeatureReductionCluster({
           clusterRadius: 100,
-          popupTemplate: popupSystems,
+          popupTemplate: popupCluster,
           popupEnabled: true,
           labelingInfo: [lc]
         });
@@ -135,7 +150,7 @@
           title: "GeoJSONLayer",
           renderer: srRed,
           featureReduction: frc,
-          popupTemplate: popupSystems
+          popupTemplate: popupLayer
         });
         map.add(gjl);
 
@@ -144,7 +159,7 @@
           title: "FeatureLayer",
           renderer: srGreen,
           featureReduction: frc,
-          popupTemplate: popupSystems
+          popupTemplate: popupLayer
         });
         map.add(fl);
 
