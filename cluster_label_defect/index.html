@@ -153,9 +153,9 @@
         function addOneToClusterLabel() {
 
           try {
-            var intIncrement = chkAddOne.checked ? '1' : '0';
+            var strIncrement = chkAddOne.checked ? '1' : '0';
           } finally {
-            lc.labelExpressionInfo = {expression: "$feature.cluster_count + " + intIncrement}
+            lc.labelExpressionInfo = {expression: "$feature.cluster_count + " + strIncrement}
             frc.labelingInfo = [lc];
             gjl.featureReduction = frc;
             fl.featureReduction = frc;
