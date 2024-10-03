@@ -32,17 +32,17 @@
     	"esri/views/MapView",
     	"esri/layers/GeoJSONLayer",
     	"esri/layers/FeatureLayer",
-		"esri/layers/support/FeatureReductionCluster",
-		"esri/symbols/TextSymbol",
-		"esri/layers/support/LabelClass",
-		"esri/renderers/SimpleRenderer",
-		"esri/symbols/SimpleMarkerSymbol",
-		"esri/widgets/LayerList",
-		"esri/PopupTemplate"
+	"esri/layers/support/FeatureReductionCluster",
+	"esri/symbols/TextSymbol",
+	"esri/layers/support/LabelClass",
+	"esri/renderers/SimpleRenderer",
+	"esri/symbols/SimpleMarkerSymbol",
+	"esri/widgets/LayerList",
+	"esri/PopupTemplate"
 		
       ], function(esriConfig, Map, MapView, GeoJSONLayer, FeatureLayer, 
 	        FeatureReductionCluster, TextSymbol, LabelClass, 
-			SimpleRenderer, SimpleMarkerSymbol, LayerList, PopupTemplate) {
+		SimpleRenderer, SimpleMarkerSymbol, LayerList, PopupTemplate) {
         
 	// Globals
 	
@@ -68,23 +68,23 @@
 	popupSystems = {
   	  title: "Fiber Info",
   	  content: [
-    	{
-      	  type: "fields",
-	      fieldInfos: [
+    		{
+      	  	  type: "fields",
+	      	  fieldInfos: [
 			{
-			  fieldName: "Incident Address",
-			  label: "Address"
+		  	  fieldName: "Incident Address",
+		 	  label: "Address"
 			},
 			{
-			  fieldName: "Status",
-			  label: "Status"		
+		  	  fieldName: "Status",
+		  	  label: "Status"		
 			},	 
 			{
-			  fieldName: "Created Date",
-			  label: "Date Reported"
+		  	  fieldName: "Created Date",
+		 	  label: "Date Reported"
 			}  
-  	      ]	
-     	}
+  	  	  ]	
+     		}
   	  ]			   		
 	}; // end of popup template configuration
         
@@ -114,7 +114,7 @@
 	
 	var tsym = new TextSymbol({
 	  color: "white",
-      font: {size: "8px"}		  
+      	  font: {size: "8px"}		  
 	});
 		
 	var lc = new LabelClass({
@@ -183,8 +183,8 @@
 
   <body>
     <div>
-	  <input type="checkbox" id="chkAddOne">WORKAROUND!! -> Add One to cluster label</input>
-	</div>
+	<input type="checkbox" id="chkAddOne">WORKAROUND!! -> Add One to cluster label</input>
+    </div>
     <div id="viewDiv"></div>
   </body>
 </html>
