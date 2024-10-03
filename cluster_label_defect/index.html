@@ -111,16 +111,12 @@
 
         var tsym = new TextSymbol({
           color: "white",
-          font: {
-            size: "8px"
-          }
+          font: {size: "8px"}
         });
 
         var lc = new LabelClass({
           sym: tsym,
-          labelExpressionInfo: {
-            expression: "$feature.cluster_count"
-          },
+          labelExpressionInfo: {expression: "$feature.cluster_count"},
           deconflictionStrategy: "none",
           labelPlacement: "center-center",
         });
@@ -159,9 +155,7 @@
           try {
             var intIncrement = chkAddOne.checked ? '1' : '0';
           } finally {
-            lc.labelExpressionInfo = {
-              expression: "$feature.cluster_count + " + intIncrement
-            }
+            lc.labelExpressionInfo = {expression: "$feature.cluster_count + " + intIncrement}
             frc.labelingInfo = [lc];
             gjl.featureReduction = frc;
             fl.featureReduction = frc;
@@ -171,12 +165,8 @@
 
         // UI elements
 
-        var widgetLayerList = new LayerList({
-          view: mapView
-        });
-        mapView.ui.add(widgetLayerList, {
-          position: 'bottom-left'
-        });
+        var widgetLayerList = new LayerList({view: mapView});
+        mapView.ui.add(widgetLayerList, {position: 'bottom-left'});
 
         var chkAddOne = document.getElementById("chkAddOne")
         chkAddOne.addEventListener("click", addOneToClusterLabel);
