@@ -207,9 +207,9 @@ require([
 
     var countTotal = 0;
 
-    gjl.queryFeatureCount(query).then(function(result) {
+    gjl.queryFeatureCount(query).then((result) => {
       countTotal = countTotal + result;
-      fl.queryFeatureCount(query).then(function(result) {
+      fl.queryFeatureCount(query).then((result) => {
         countTotal = countTotal + result;
         lblCheckbox.textContent = strCheckboxLabel + countTotal.toString();
       });
