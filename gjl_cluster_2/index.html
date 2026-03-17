@@ -156,7 +156,7 @@ require([
   });
 
   // layers
-
+/*
   var gjl = new GeoJSONLayer({
     url: "https://jimbarry.github.io/json-files/Aug1_311_gj.geojson",
     title: "GeoJSONLayer",
@@ -166,9 +166,10 @@ require([
     popupTemplate: popupLayer
   });
   map.add(gjl);
+*/
+ //url: "https://services9.arcgis.com/hsPsr2XddCBblVhb/arcgis/rest/services/Aug2_311/FeatureServer/0",
 
-  var fl = new FeatureLayer({
-    //url: "https://services9.arcgis.com/hsPsr2XddCBblVhb/arcgis/rest/services/Aug2_311/FeatureServer/0",
+ var fl = new FeatureLayer({
 	url: "https://services9.arcgis.com/hsPsr2XddCBblVhb/arcgis/rest/services/Mar16_311/FeatureServer/0",  
     title: "FeatureLayer",
     renderer: srGreen,
